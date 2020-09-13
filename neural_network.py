@@ -2,7 +2,7 @@ import numpy as np
 
 
 class NeuralNetwork:
-    """Clas represent neural network"""
+    """Class represent neural network"""
     
     def __init__(self, layer_dims, activations:list, derivatives:list, eta=0.5):
         
@@ -16,39 +16,29 @@ class NeuralNetwork:
     def insert_data(self, x, y):
         """Function insert given data to neural network
         
-        Weights matrix are randomized
+        Weights matrix are initiated randomly
         """
-
         self.input = x
         self.y = y
         # Initial weights matrix
         self.weights[0] = np.random.rand(self.layer_dims[0], self.input.shape[1])
         for i in range(1, len(self.layer_dims)):
             self.weights[i] = np.random.rand(self.layer_dims[i], self.layer_dims[i-1])
-        # Output given by network
-        #self.output = np.zeros(self.y.shape)
-        print(self.layers)
-        print(self.activations)
-        print(self.derivatives)
-        for w in self.weights:
-            print(w.shape)
 
-    def feedfoward(self):
-        """Compute layers output using feed foward"""
-
+    def feed_forward(self):
+        """Compute layers output using feed forward"""
         self.layers[0] = self.activations[0](np.dot(self.input, self.weights[0].T))
         for i in range(1, len(self.layer_dims)):
             self.layers[i] = self.activations[i](np.dot(self.layers[i-1], self.weights[i].T))
 
     def backprop(self):
-        """Find better working weihts 
+        """Find better working weights 
         
         first Compute weights gradient
         then use it to find possible better solution
         using gradient descent algorithm
-        (backprop represent one step)
+        (backprop correspond to one gradient step)
         """
-
         self.deltas = [[] for _ in range(len(self.layers))]
         self.d_weights = [[] for _ in range(len(self.layers))]
         self.deltas[-1] = (self.y - self.layers[-1]) * self.derivatives[-1](np.dot(self.layers[-2], self.weights[-1].T))
@@ -67,8 +57,7 @@ class NeuralNetwork:
         Where min_value_y, max_value_y are param used to scale y
         we need them to scale bax neural network output
         """
-
-        self.feedfoward()
+        self.feed_forward()
         cost = 0
         for i in range(len(orginal_y)):
             cost += (self.layers[-1][i] * (max_value_y - min_value_y)

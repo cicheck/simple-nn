@@ -1,4 +1,5 @@
 from neural_network import NeuralNetwork
+# Import activation functions
 from act_functions import sigmoid, sigmoid_derivative, \
     relu, relu_derivative, tanh, tanh_derivative
 import numpy as np
@@ -6,33 +7,30 @@ from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 import sys
 
-def regulize(Y):
+
+def scale(Y):
     """Function scale Y values, output is in range [0, 1]
     
-    return modified Y and used modifiers
+    return modified Y and used for scaling min, max values
     """
-
-    min_value = 0
-    max_value = 0
-    for y in Y:
-        if y < min_value:
-            min_value = y
-        if y > max_value:
-            max_value = y
+    min_value = Y.min()
+    max_value = Y.max()
     Y = (Y - min_value) / (max_value - min_value)
+
     return Y, min_value, max_value
 
 def show_learning(ticks_number, neural_network, train_X, train_y, \
          test_X, test_y, add_param=False):
-    """Function train neural_network using train points
+    """Function train neural_network using train_X
     
     and plot "learned" function every 100 steps
     Where:
-    ticks_number -> after that number reset learning
-    add_param -> if its true add extrpa polynomial X params
+    ticks_number -- after that number of iterations reset learning
+    add_param -- if its true add extra polynomial X params
     """
     
     nn = neural_network
+    # save orginal train_X, train_y
     orginal_y = train_y.copy()
     x_axis = train_X.copy()
     # Reshape X, y into matrix
@@ -49,7 +47,7 @@ def show_learning(ticks_number, neural_network, train_X, train_y, \
     # Insert extra ones
     X = np.c_[X, np.ones(len(train_y))]
     # Scale y
-    y, min_value_y, max_value_y = regulize(y)
+    y, min_value_y, max_value_y = scale(y)
 
     # Initiate animation params
     fig = plt.figure()
@@ -79,7 +77,7 @@ def show_learning(ticks_number, neural_network, train_X, train_y, \
                      min_value_y, max_value_y))
 
         for _ in range(100):
-            nn.feedfoward()
+            nn.feed_forward()
             nn.backprop()
             y_axis = nn.output() * (max_value_y - min_value_y) + min_value_y
         x = x_axis
@@ -96,10 +94,10 @@ def show_learning(ticks_number, neural_network, train_X, train_y, \
     plt.legend(loc="lower left")
     plt.show()
 
+
 def test_configuration(test_number, neural_network, train_X, train_y):
     """Function train neural_network and return error cost
 
-    function used only for debugging
     Where test_number is a number of backprop call
     """
     
@@ -110,10 +108,10 @@ def test_configuration(test_number, neural_network, train_X, train_y):
     y = train_y.reshape(-1, 1)
     # Insert extra ones
     X = np.c_[X, np.ones(len(train_y))]
-    y, min_value_y, max_value_y = regulize(y)
+    y, min_value_y, max_value_y = scale(y)
     nn.insert_data(X, y)
     for _ in range(test_number):
-        nn.feedfoward()
+        nn.feed_forward()
         nn.backprop()
     return nn.cost_function(orginal_y, min_value_y, max_value_y)
 
